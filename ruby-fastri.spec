@@ -1,4 +1,5 @@
 Summary:	Fast Ruby documentation browser
+Summary(pl.UTF-8):	Szybka przeglądarka dokumentacji Ruby
 Name:		ruby-fastri
 Version:	0.2.1
 Release:	1
@@ -11,7 +12,20 @@ URL:		http://eigenclass.org/hiki.rb?fastri
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Fast Ruby documentation browser
+FastRI is an alternative to the ri command-line tool. It is *much*
+faster, and also allows you to offer RI lookup services over DRb.
+FastRI is a bit smarter than ri, and can find classes anywhere in
+the hierarchy without specifying the "full path". It also knows
+about gems, and can tell you e.g. which extensions to a core class
+were added by a specific gem.
+
+%description -l pl.UTF-8
+FastRI jest alternatywą dla narzędzia ri. Jest *znacznie* szybszy i
+pozwala na oferowanie usług wyszukiwania RI poprzez DRb. FastRI jest
+nieco mądrzejszy od ri i może znaleźć klasy gdziekolwiek w hierarchii
+bez potrzeby podawania "pełnej ścieżki". Wie także o gemach i może
+informować np. o tym które rozszerzenia klasy bazowej zostały dodane
+przez określony gem.
 
 %prep
 %setup -q -n fastri-%{version}
