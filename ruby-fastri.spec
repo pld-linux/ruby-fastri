@@ -1,17 +1,17 @@
-#
-# Conditional build:
-%bcond_without	docs # don't generate & install documentation (most timeconsuming)
-%define		_name	fastri
+%define	pkgname	fastri
 Summary:	Fast Ruby documentation browser
 Summary(pl.UTF-8):	Szybka przeglądarka dokumentacji Ruby
-Name:		ruby-%{_name}
+Name:		ruby-%{pkgname}
 Version:	0.3.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Development/Languages
-Source0:	http://eigenclass.org/static/fastri/%{_name}-%{version}.tar.gz	
+Source0:	http://eigenclass.org/static/fastri/%{pkgname}-%{version}.tar.gz	
 # Source0-md5:	3a7d0a64b1c8e230a34ef7b4bad30dbe
 URL:		http://eigenclass.org/hiki.rb?fastri
+BuildRequires:	rpmbuild(macros) >= 1.484
+BuildRequires:	ruby >= 1:1.8.6
+BuildRequires:	ruby-modules
 %{?ruby_mod_ver_requires_eq}
 Requires:	ruby-modules >= 1:1.8.7-3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -32,43 +32,71 @@ bez potrzeby podawania "pełnej ścieżki". Wie także o gemach i może
 informować np. o tym które rozszerzenia klasy bazowej zostały dodane
 przez określony gem.
 
+%package rdoc
+Summary:	HTML documentation for %{pkgname}
+Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla %{pkgname}
+Group:		Documentation
+Requires:	ruby >= 1:1.8.7-4
+
+%description rdoc
+HTML documentation for %{pkgname}.
+
+%description rdoc -l pl.UTF-8
+Dokumentacja w formacie HTML dla %{pkgname}.
+
+%package ri
+Summary:	ri documentation for %{pkgname}
+Summary(pl.UTF-8):	Dokumentacja w formacie ri dla %{pkgname}
+Group:		Documentation
+Requires:	ruby
+
+%description ri
+ri documentation for %{pkgname}.
+
+%description ri -l pl.UTF-8
+Dokumentacji w formacie ri dla %{pkgname}.
+
 %prep
-%setup -q -n %{_name}-%{version}
+%setup -q -n %{pkgname}-%{version}
 
 %build
 %{__ruby} setup.rb config \
 	--site-ruby=%{ruby_vendorlibdir} \
 	--so-dir=%{ruby_vendorarchdir}
+
 ruby setup.rb setup
 
-%if %{with docs}
 rdoc --ri -o ri lib
 rdoc -o rdoc lib
-%endif
+rm -r ri/{DefaultDisplay,Gem,RI}
+rm ri/created.rid
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
 
 ruby setup.rb install \
 	--prefix=$RPM_BUILD_ROOT
 
-%if %{with docs}
-#install -d $RPM_BUILD_ROOT%{ruby_ridir} <- now it points to `/usr/share/ri/1.8/system', should to /usr/share/ri/1.8
-install -d $RPM_BUILD_ROOT%{_datadir}/ri/%{ruby_version}/site # should be `vendor' instead of `site'? ri/fastri supports looking into `vendor' subdir? 
-rm -f {ri,rdoc}/created.rid
-cp -fR ri/* $RPM_BUILD_ROOT%{_datadir}/ri/%{ruby_version}/site
-%endif
+cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
+cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%doc CHANGES README.en THANKS %{?with_docs:rdoc/*}
 %defattr(644,root,root,755)
+%doc CHANGES README.en THANKS
 %attr(755,root,root) %{_bindir}/fastri-server
 %attr(755,root,root) %{_bindir}/fri
 %attr(755,root,root) %{_bindir}/qri
 %attr(755,root,root) %{_bindir}/ri-emacs
 %{ruby_vendorlibdir}/fastri
-%dir %{?with_docs:%{_datadir}/ri/%{ruby_version}/site}
-%{?with_docs:%{_datadir}/ri/%{ruby_version}/site/*}
+
+%files rdoc
+%defattr(644,root,root,755)
+%{ruby_rdocdir}/%{name}-%{version}
+
+%files ri
+%defattr(644,root,root,755)
+%{ruby_ridir}/FastRI
