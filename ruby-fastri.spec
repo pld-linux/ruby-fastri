@@ -3,7 +3,7 @@ Summary:	Fast Ruby documentation browser
 Summary(pl.UTF-8):	Szybka przeglądarka dokumentacji Ruby
 Name:		ruby-%{pkgname}
 Version:	0.3.1
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Development/Languages
 Source0:	http://eigenclass.org/static/fastri/%{pkgname}-%{version}.tar.gz	
