@@ -3,26 +3,24 @@ Summary:	Fast Ruby documentation browser
 Summary(pl.UTF-8):	Szybka przeglądarka dokumentacji Ruby
 Name:		ruby-%{pkgname}
 Version:	0.3.1
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		Development/Languages
-Source0:	http://eigenclass.org/static/fastri/%{pkgname}-%{version}.tar.gz	
+Source0:	http://eigenclass.org/static/fastri/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	3a7d0a64b1c8e230a34ef7b4bad30dbe
 URL:		http://eigenclass.org/hiki.rb?fastri
-BuildRequires:	rpmbuild(macros) >= 1.484
-BuildRequires:	ruby >= 1:1.8.6
-BuildRequires:	ruby-modules
-%{?ruby_mod_ver_requires_eq}
-Requires:	ruby-modules >= 1:1.8.7-3
+BuildRequires:	rpm-rubyprov
+BuildRequires:	rpmbuild(macros) >= 1.665
+BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 FastRI is an alternative to the ri command-line tool. It is *much*
 faster, and also allows you to offer RI lookup services over DRb.
-FastRI is a bit smarter than ri, and can find classes anywhere in
-the hierarchy without specifying the "full path". It also knows
-about gems, and can tell you e.g. which extensions to a core class
-were added by a specific gem.
+FastRI is a bit smarter than ri, and can find classes anywhere in the
+hierarchy without specifying the "full path". It also knows about
+gems, and can tell you e.g. which extensions to a core class were
+added by a specific gem.
 
 %description -l pl.UTF-8
 FastRI jest alternatywą dla narzędzia ri. Jest *znacznie* szybszy i
@@ -60,23 +58,20 @@ Dokumentacji w formacie ri dla %{pkgname}.
 %setup -q -n %{pkgname}-%{version}
 
 %build
-%{__ruby} setup.rb config \
-	--site-ruby=%{ruby_vendorlibdir} \
-	--so-dir=%{ruby_vendorarchdir}
-
-ruby setup.rb setup
-
 rdoc --ri -o ri lib
 rdoc -o rdoc lib
 rm -r ri/{DefaultDisplay,Gem,RI}
 rm ri/created.rid
+rm ri/cache.ri
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_rubylibdir},%{ruby_ridir},%{ruby_rdocdir}}
+install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_ridir},%{ruby_rdocdir},%{_bindir}}
 
-ruby setup.rb install \
-	--prefix=$RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{ruby_vendorlibdir}
+cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
+cp -a bin/* $RPM_BUILD_ROOT%{_bindir}
+ln -s fri $RPM_BUILD_ROOT%{_bindir}/qri
 
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
